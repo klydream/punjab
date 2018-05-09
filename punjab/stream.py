@@ -1,11 +1,16 @@
+"""
+
+"""
 from twisted.words import domish
 
 
 class PunjabElementStream(domish.ExpatElementStream):
     """
-    We need to store the raw unicode data to bypass serialization.
-    """
 
+    We need to store the raw unicode data to bypass serialization.
+
+    """
+    
     def _onStartElement(self, name, attrs):
         # Generate a qname tuple from the provided name
         qname = name.split(" ")
@@ -20,13 +25,12 @@ class PunjabElementStream(domish.ExpatElementStream):
                 del attrs[k]
 
         # Construct the new element
-        e = domish.Element(qname, self.defaultNsStack[-1],
-                           attrs, self.localPrefixes)
+        e = domish.Element(qname, self.defaultNsStack[-1], attrs, self.localPrefixes)
         self.localPrefixes = {}
 
         # Document already started
         if self.documentStarted == 1:
-            if self.currElem is not None:
+            if self.currElem != None:
                 self.currElem.children.append(e)
                 e.parent = self.currElem
             self.currElem = e
@@ -40,6 +44,7 @@ class PunjabElementStream(domish.ExpatElementStream):
         # Check for null current elem; end of doc
         if self.currElem is None:
             self.DocumentEndEvent()
+            
         # Check for parent that is None; that's
         # the top of the stack
         elif self.currElem.parent is None:
@@ -52,7 +57,7 @@ class PunjabElementStream(domish.ExpatElementStream):
             self.currElem = self.currElem.parent
 
     def _onCdata(self, data):
-        if self.currElem is not None:
+        if self.currElem != None:
             self.currElem.addContent(data)
 
     def _onStartNamespace(self, prefix, uri):
